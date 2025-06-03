@@ -90,6 +90,24 @@ int printf(const char* restrict format, ...) {
             if (!print(buffer, length))
                 return -1;
             written += length;
+        } else if (*format == 'x') {
+            format++;
+            size_t length = 11;
+            char* hex = "0123456789ABCDEF";
+            char buffer[length];
+            memcpy(buffer, "0x", 2);
+
+            int value = va_arg(parameters, unsigned int);
+
+            for(int i = 0; i < 8; i++) {
+                buffer[9-i] = hex[(value >> (i * 4)) & 0xF];
+            }
+            buffer[length - 1] = '\0';
+
+            if (!print(buffer, length)) {
+                return -1;
+            }
+            written += length;
         } else {
 			format = format_begun_at;
 			size_t len = strlen(format);
