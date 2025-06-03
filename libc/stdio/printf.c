@@ -61,7 +61,36 @@ int printf(const char* restrict format, ...) {
 			if (!print(str, len))
 				return -1;
 			written += len;
-		} else {
+        } else if (*format == 'd') {
+            format++;
+            char buffer[12];
+            size_t i = 0;
+            int integer = va_arg(parameters, int);
+
+            do {
+                buffer[i++] = '0' + (integer % 10);
+                integer /= 10;
+            } while (integer);
+
+            size_t length = strlen(buffer);
+            if (maxrem < length) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+
+            size_t l = 0, r = length - 1;
+            while (l < r) {
+                char temp = buffer[r];
+                buffer[r] = buffer[l];
+                buffer[l] = temp;
+                l++;
+                r--;
+            }
+
+            if (!print(buffer, length))
+                return -1;
+            written += length;
+        } else {
 			format = format_begun_at;
 			size_t len = strlen(format);
 			if (maxrem < len) {
