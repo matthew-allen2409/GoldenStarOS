@@ -56,6 +56,8 @@ void terminal_scroll(void) {
 void terminal_putchar(char c) {
 	unsigned char uc = c;
     switch (uc) {
+        case '\0':
+          break;
         case '\n':
             terminal_column = 0;
             terminal_row++;
