@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
+
 typedef struct {
     uint32_t flags;
 
@@ -37,3 +39,18 @@ typedef struct {
     uint16_t vbe_interface_len;
 
 } __attribute__((packed)) multiboot_info_t;
+
+typedef struct {
+    uint32_t size;
+    uint32_t addr_low;
+    uint32_t addr_high;
+    uint32_t length_low;
+    uint32_t length_high;
+    #define MULTIBOOT_MEMORY_AVAILABLE              1
+    #define MULTIBOOT_MEMORY_RESERVED               2
+    #define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE       3
+    #define MULTIBOOT_MEMORY_NVS                    4
+    #define MULTIBOOT_MEMORY_BADRAM                 5
+    uint32_t type;
+
+} __attribute__((packed)) mmap_entry_t;

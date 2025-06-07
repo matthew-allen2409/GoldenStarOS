@@ -62,6 +62,7 @@ int printf(const char* restrict format, ...) {
 				return -1;
 			written += len;
         } else if (*format == 'd') {
+            // TODO: Handle negative values
             format++;
             char buffer[12];
             size_t i = 0;
@@ -78,6 +79,7 @@ int printf(const char* restrict format, ...) {
                 return -1;
             }
 
+            buffer[i] = '\0';
             size_t l = 0, r = length - 1;
             while (l < r) {
                 char temp = buffer[r];
@@ -92,21 +94,50 @@ int printf(const char* restrict format, ...) {
             written += length;
         } else if (*format == 'x') {
             format++;
-            size_t length = 11;
+            size_t length = 9;
             char* hex = "0123456789ABCDEF";
             char buffer[length];
-            memcpy(buffer, "0x", 2);
 
             int value = va_arg(parameters, unsigned int);
 
             for(int i = 0; i < 8; i++) {
-                buffer[9-i] = hex[(value >> (i * 4)) & 0xF];
+                buffer[7-i] = hex[(value >> (i * 4)) & 0xF];
             }
             buffer[length - 1] = '\0';
 
             if (!print(buffer, length)) {
                 return -1;
             }
+            written += length;
+        } else if (*format == 'u') {
+            format++;
+            char buffer[11];
+            size_t i = 0;
+            int integer = va_arg(parameters, unsigned int);
+
+            do {
+                buffer[i++] = '0' + (integer % 10);
+                integer /= 10;
+            } while (integer);
+
+            size_t length = strlen(buffer);
+            if (maxrem < length) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            buffer[i] = '\0';
+
+            size_t l = 0, r = length - 1;
+            while (l < r) {
+                char temp = buffer[r];
+                buffer[r] = buffer[l];
+                buffer[l] = temp;
+                l++;
+                r--;
+            }
+
+            if (!print(buffer, length))
+                return -1;
             written += length;
         } else {
 			format = format_begun_at;

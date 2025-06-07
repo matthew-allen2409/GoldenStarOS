@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include <kernel/tty.h>
+#include <kernel/memory.h>
 #include <multiboot/multiboot.h>
 
 void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
@@ -12,5 +13,5 @@ void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
         return;
     }
 
-    printf("Hello, World!!\n");
+    setup_memory(multiboot_info);
 }
