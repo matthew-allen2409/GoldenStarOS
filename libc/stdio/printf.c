@@ -73,13 +73,13 @@ int printf(const char* restrict format, ...) {
                 integer /= 10;
             } while (integer);
 
+            buffer[i] = '\0';
             size_t length = strlen(buffer);
             if (maxrem < length) {
                 // TODO: Set errno to EOVERFLOW.
                 return -1;
             }
 
-            buffer[i] = '\0';
             size_t l = 0, r = length - 1;
             while (l < r) {
                 char temp = buffer[r];
@@ -120,12 +120,13 @@ int printf(const char* restrict format, ...) {
                 integer /= 10;
             } while (integer);
 
-            size_t length = strlen(buffer);
+            buffer[i] = '\0';
+            size_t length = i;
+
             if (maxrem < length) {
                 // TODO: Set errno to EOVERFLOW.
                 return -1;
             }
-            buffer[i] = '\0';
 
             size_t l = 0, r = length - 1;
             while (l < r) {
@@ -138,6 +139,7 @@ int printf(const char* restrict format, ...) {
 
             if (!print(buffer, length))
                 return -1;
+
             written += length;
         } else {
 			format = format_begun_at;
