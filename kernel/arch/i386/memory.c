@@ -60,7 +60,7 @@ void setup_memory(multiboot_info_t* mbinfo) {
 bool check_bit(size_t bit) {
     size_t byte = bit / 8;
     
-    return (page_bitmap[byte] & (1 << (bit % 8))) != 0;
+    return (page_bitmap[byte] & (1 << (bit % 8))) == 0;
 }
 
 void set_bit(size_t bit) {
