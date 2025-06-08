@@ -13,4 +13,6 @@ extern uint8_t _endkernel;
 
 void setup_memory(multiboot_info_t* mbinfo);
 
+uint32_t alloc_page();
+
 #endif
