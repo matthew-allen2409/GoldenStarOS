@@ -14,4 +14,5 @@ void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
     }
 
     setup_memory(multiboot_info);
+    printf("Paging Enabled!");
 }

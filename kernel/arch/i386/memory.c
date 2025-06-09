@@ -6,9 +6,48 @@
 #include <kernel/memory.h>
 
 uint8_t page_bitmap[BITMAP_SIZE];
+__attribute__((aligned(4096))) uint32_t page_directory[PAGE_DIRECTORY_SIZE];
+__attribute__((aligned(4096))) uint32_t first_page_table[PAGE_TABLE_SIZE];
 
-uint32_t kernel_start_phys = (uint32_t)&_kernel_start;
-uint32_t kernel_end_phys = (uint32_t)&_endkernel;
+uint32_t kernel_start_phys = (uint32_t) &_kernel_start;
+uint32_t kernel_end_phys = (uint32_t) &_endkernel;
+
+bool check_bit(size_t bit) {
+    size_t byte = bit / 8;
+    
+    return (page_bitmap[byte] & (1 << (bit % 8))) == 0;
+}
+
+void set_bit(size_t bit) {
+    size_t byte = bit / 8;
+    page_bitmap[byte] |= (1 << (bit % 8));
+}
+
+void clear_bit(size_t bit) {
+    size_t byte = bit / 8;
+    page_bitmap[byte] &= ~(1 << (bit % 8));
+}
+
+void init_identity_map() {
+    for (int i = 0; i < PAGE_TABLE_SIZE; i++) {
+        first_page_table[i] = (i * PAGE_SIZE) | 3;
+    }
+
+    for (int i = 0; i < PAGE_DIRECTORY_SIZE; i++) {
+        page_directory[i] = 0x00000002;
+    }
+
+    page_directory[0] = ((uint32_t) first_page_table) | 3;
+}
+
+void enable_paging() {
+    asm volatile("mov %0, %%cr3" :: "r"(page_directory));
+
+    uint32_t cr0;
+    asm volatile("mov %%cr0, %0" : "=r"(cr0));
+    cr0 |= 0x80000000;
+    asm volatile("mov %0, %%cr0" :: "r"(cr0));
+}
 
 uint32_t init_paging(uint32_t mmap_current, uint32_t mmap_length) {
     memset(page_bitmap, 0xFF, BITMAP_SIZE);
@@ -36,9 +75,12 @@ uint32_t init_paging(uint32_t mmap_current, uint32_t mmap_length) {
                   continue;
               }
 
-              page_bitmap[p / 8] &= ~(1 << (p % 8));
+              clear_bit(p);
           }
         }
+
+        init_identity_map();
+        enable_paging();
 
         mmap_current += entry->size + sizeof(entry->size);
     }
@@ -57,17 +99,6 @@ void setup_memory(multiboot_info_t* mbinfo) {
     printf("Total memory: %u megabytes\n", max_addr / (1024 * 1024));
 }
 
-bool check_bit(size_t bit) {
-    size_t byte = bit / 8;
-    
-    return (page_bitmap[byte] & (1 << (bit % 8))) == 0;
-}
-
-void set_bit(size_t bit) {
-    size_t byte = bit / 8;
-    page_bitmap[byte] |= (1 << (bit % 8));
-}
-
 uint32_t alloc_page() {
     uint32_t num_pages = BITMAP_SIZE * 8;
 
@@ -80,3 +111,9 @@ uint32_t alloc_page() {
 
     return 0;
 }
+
+void free_page(size_t page) {
+    clear_bit(page);
+}
+
+
