@@ -14,5 +14,18 @@ void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
     }
 
     setup_memory(multiboot_info);
-    printf("Paging Enabled!");
+    printf("Paging Enabled!\n");
+
+     uint32_t* num1 = kmalloc(sizeof(uint32_t), sizeof(uint32_t));
+
+     *num1 = 696969;
+
+     uint32_t* num2 = kmalloc(sizeof(uint32_t), sizeof(uint32_t));
+
+     *num2 = 12345;
+
+     printf("num1 addr: %x\n", num1);
+     printf("num1: %u\n", *num1);
+     printf("num2 addr: %x\n", num2);
+     printf("num2: %u\n", *num2);
 }
