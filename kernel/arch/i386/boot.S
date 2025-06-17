@@ -40,3 +40,20 @@ _start:
 1:	hlt
     jmp 1b
 .size _start, . - _start
+
+.globl load_gdt
+.type load_gdt, @function
+
+load_gdt:
+    movl 4(%esp), %eax
+    lgdt (%eax)
+    ljmp $0x08, $flush_cs
+
+flush_cs:
+    movw $0x10, %ax
+    movw %ax, %ds
+    movw %ax, %es
+    movw %ax, %fs
+    movw %ax, %gs
+    movw %ax, %ss
+    ret

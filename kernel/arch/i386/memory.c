@@ -4,6 +4,7 @@
 
 #include <multiboot/multiboot.h>
 #include <kernel/memory.h>
+#include <kernel/gdt.h>
 
 static uint32_t total_memory = 0;
 static uint32_t total_pages = 0;
@@ -81,7 +82,7 @@ void init_paging(uint32_t mmap_start, uint32_t mmap_length) {
     for (uint32_t mmap_current = mmap_start; mmap_current < mmap_end;) {
         mmap_entry_t* entry = (mmap_entry_t*) mmap_current;
 
-        if (entry->type == 1) { // Usable
+        if (entry->type == 1) {
             size_t first_page = entry->addr_low / PAGE_SIZE;
             size_t last_page = (entry->addr_low + entry->length_low + PAGE_SIZE - 1) / PAGE_SIZE;
 
@@ -113,11 +114,12 @@ void setup_memory(multiboot_info_t* mbinfo) {
     }
 
     total_pages = total_memory / PAGE_SIZE;
+    init_gdt();
     init_paging(mbinfo->mmap_addr, mbinfo->mmap_length);
 
     printf("Total memory: %u megabytes\n", total_memory / (1024 * 1024));
 }
-// TODO: Really should unit test this I did this without thinking just assuming it will work.
+
 bool page_present(uintptr_t addr) {
     return check_bit(addr / PAGE_SIZE);
 }
