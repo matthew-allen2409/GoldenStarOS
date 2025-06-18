@@ -5,6 +5,11 @@
 #include <kernel/memory.h>
 #include <multiboot/multiboot.h>
 
+uint8_t divide_by_zero(uint8_t x) {
+  uint8_t y = 69 / x;
+  return y;
+}
+
 void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
     terminal_initialize();
 
@@ -28,4 +33,7 @@ void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
     printf("num1: %u\n", *num1);
     printf("num2 addr: 0x%x\n", num2);
     printf("num2: %u\n", *num2);
+
+    uint8_t x = divide_by_zero(0);
+    printf("here %d\n", x);
 }

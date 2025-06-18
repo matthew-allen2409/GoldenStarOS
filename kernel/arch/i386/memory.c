@@ -5,6 +5,7 @@
 #include <multiboot/multiboot.h>
 #include <kernel/memory.h>
 #include <kernel/gdt.h>
+#include <kernel/idt.h>
 
 static uint32_t total_memory = 0;
 static uint32_t total_pages = 0;
@@ -115,6 +116,7 @@ void setup_memory(multiboot_info_t* mbinfo) {
 
     total_pages = total_memory / PAGE_SIZE;
     init_gdt();
+    idt_init();
     init_paging(mbinfo->mmap_addr, mbinfo->mmap_length);
 
     printf("Total memory: %u megabytes\n", total_memory / (1024 * 1024));
