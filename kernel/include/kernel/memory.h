@@ -26,8 +26,6 @@ extern uint8_t _endkernel;
 
 void setup_memory(multiboot_info_t* mbinfo);
 
-uint32_t alloc_page();
 void* kmalloc(uint32_t size, uint32_t alignment);
-void free_page(size_t page);
 
 #endif

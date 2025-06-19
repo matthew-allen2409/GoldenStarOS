@@ -4,8 +4,6 @@
 
 #include <multiboot/multiboot.h>
 #include <kernel/memory.h>
-#include <kernel/gdt.h>
-#include <kernel/idt.h>
 
 static uint32_t total_memory = 0;
 static uint32_t total_pages = 0;
@@ -16,18 +14,18 @@ static __attribute__((aligned(4096))) uint32_t first_page_table[PAGE_TABLE_SIZE]
 
 static uint32_t kernel_heap_ptr = (uint32_t) &_endkernel;
 
-bool check_bit(size_t bit) {
+bool check_page(size_t bit) {
     size_t byte = bit / 8;
 
     return (page_bitmap[byte] & (1 << (bit % 8))) == 1;
 }
 
-void set_bit(size_t bit) {
+void set_page(size_t bit) {
     size_t byte = bit / 8;
     page_bitmap[byte] |= (1 << (bit % 8));
 }
 
-void clear_bit(size_t bit) {
+void clear_page(size_t bit) {
     size_t byte = bit / 8;
     page_bitmap[byte] &= ~(1 << (bit % 8));
 }
@@ -91,7 +89,7 @@ void init_paging(uint32_t mmap_start, uint32_t mmap_length) {
                 uint32_t addr = p * PAGE_SIZE;
 
                 if (addr >= kernel_heap_ptr) {
-                    clear_bit(p);
+                    clear_page(p);
                 }
             }
         }
@@ -115,25 +113,22 @@ void setup_memory(multiboot_info_t* mbinfo) {
     }
 
     total_pages = total_memory / PAGE_SIZE;
-    init_gdt();
-    idt_init();
     init_paging(mbinfo->mmap_addr, mbinfo->mmap_length);
 
     printf("Total memory: %u megabytes\n", total_memory / (1024 * 1024));
 }
 
 bool page_present(uintptr_t addr) {
-    return check_bit(addr / PAGE_SIZE);
+    return check_page(addr / PAGE_SIZE);
 }
 
 uintptr_t alloc_phys_page() {
     uint32_t num_pages = total_pages * 8;
 
     for (size_t p = 0; p < num_pages; p++) {
-        if (!check_bit(p)) {
-            set_bit(p);
+        if (!check_page(p)) {
+            set_page(p);
             uintptr_t page_addr = p * PAGE_SIZE;
-            memset((void*) page_addr, 0, PAGE_SIZE);
             return page_addr;
         }
     }

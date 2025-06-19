@@ -1,8 +1,6 @@
 #include <kernel/idt.h>
-#include <stdbool.h>
 #include <stdio.h>
 
-static bool vectors[IDT_MAX_DESCRIPTORS];
 static idt_entry_t idt[IDT_MAX_DESCRIPTORS];
 static idt_ptr_t idtr;
 
@@ -24,14 +22,12 @@ void idt_init(void) {
 
     for (uint8_t vector = 0; vector < 32; vector++) {
         idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
-        vectors[vector] = true;
     }
 
     __asm__ volatile ("lidt %0" : : "m"(idtr));
     __asm__ volatile ("sti");
 }
 
-__attribute__((noreturn))
 void generic_exception_handler(void) {
     printf("OOPSIES\n");
     __asm__ volatile ("cli; hlt");
