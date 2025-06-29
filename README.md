@@ -15,7 +15,7 @@ At this stage, GoldenStarOS focuses on core kernel development — bootstrapping
 
 GoldenStarOS exists to:
 
-- 💡 Leaern systems programming through hands-on experimentation
+- 💡 Learn systems programming through hands-on experimentation
 - 🧱 Serve as a modular foundation for building OS features
 - 🧠 To explore concepts like paging, interrupts, and memory management, and scheduling
 - 🛠️ Provide a sandbox for hacking on low-level systems
