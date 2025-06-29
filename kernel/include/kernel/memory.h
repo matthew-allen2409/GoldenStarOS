@@ -4,7 +4,7 @@
 #include <multiboot/multiboot.h>
 #include <stdint.h>
 
-#define HEAP_START 0X400000
+#define HEAP_START 0XC1000000
 
 #define PAGE_SIZE 4096
 #define PAGE_DIRECTORY_SIZE 1024
@@ -25,6 +25,14 @@ extern uint8_t _kernel_start;
 extern uint8_t _endkernel;
 
 void setup_memory(multiboot_info_t* mbinfo);
+
+void reserve_page(uintptr_t addr);
+
+void map_page(uintptr_t virtual_addr, uintptr_t phys_addr, uint32_t flags);
+
+void reserve_region(uintptr_t addr, uint32_t size);
+
+void map_region(uintptr_t virtual_addr, uintptr_t phys_addr, uint32_t size, uint32_t flags);
 
 void* kmalloc(uint32_t size, uint32_t alignment);
 

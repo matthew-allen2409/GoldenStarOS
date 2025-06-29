@@ -122,6 +122,12 @@ bool page_present(uintptr_t addr) {
     return check_page(addr / PAGE_SIZE);
 }
 
+void reserve_page(uintptr_t addr) {
+    size_t p = addr / PAGE_SIZE;
+
+    set_page(p);
+}
+
 uintptr_t alloc_phys_page() {
     uint32_t num_pages = total_pages * 8;
 
@@ -153,6 +159,34 @@ void map_page(uintptr_t virtual_addr, uintptr_t phys_addr, uint32_t flags) {
     uint32_t* page_table = (uint32_t*) (0xFFC00000 + (pd_idx << 12));
 
     page_table[pt_idx] = phys_addr | flags | PRESENT;
+}
+
+void reserve_region(uintptr_t addr, uint32_t size)
+{
+    uintptr_t aligned_base = addr & ~(PAGE_SIZE - 1);
+    // Align the end address up to cover any partial page at the end
+    uintptr_t end_addr = (addr + size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+
+    for (uintptr_t addr = aligned_base; addr < end_addr; addr += PAGE_SIZE) {
+        reserve_page(addr);
+    }
+}
+
+void map_region(uintptr_t virtual_addr,
+    uintptr_t physical_addr,
+    uint32_t size,
+    uint32_t flags)
+{
+    size_t aligned_start = physical_addr & ~(PAGE_SIZE - 1);
+    size_t offset = physical_addr - aligned_start;
+    size_t total = offset + size;
+    size_t page_count = (total + PAGE_SIZE - 1) / PAGE_SIZE;
+
+    for (size_t i = 0; i < page_count; i++) {
+        map_page(virtual_addr + i * PAGE_SIZE,
+                 aligned_start + i * PAGE_SIZE,
+                 flags);
+    }
 }
 
 void* kmalloc(uint32_t size, uint32_t alignment) {

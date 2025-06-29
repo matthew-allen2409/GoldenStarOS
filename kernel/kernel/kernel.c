@@ -5,13 +5,18 @@
 #include <kernel/memory.h>
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
+#include <kernel/pic.h>
+#include <kernel/apic.h>
 #include <multiboot/multiboot.h>
 
 void kernel_init(multiboot_info_t* multiboot_info) {
+    setup_memory(multiboot_info);
     terminal_initialize();
     init_gdt();
     idt_init();
-    setup_memory(multiboot_info);
+    PIC_remap(0x20, 0x28);
+    enable_apic();
+    io_apic_init();
 }
 
 void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
@@ -24,14 +29,9 @@ void kernel_main(uint32_t magic, multiboot_info_t* multiboot_info) {
 
     uint32_t* num1 = kmalloc(sizeof(uint32_t), sizeof(uint32_t));
 
-    *num1 = 696969;
+    *num1 = 69;
 
-    uint32_t* num2 = kmalloc(sizeof(uint32_t), sizeof(uint32_t));
-
-    *num2 = 12345;
+    printf("num1 addr: 0x%x\n", num1);
 
     printf("num1: %u\n", *num1);
-    printf("num1 addr: 0x%x\n", num1);
-    printf("num2: %u\n", *num2);
-    printf("num2 addr: 0x%x\n", num2);
 }
