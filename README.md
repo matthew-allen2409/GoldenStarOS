@@ -7,6 +7,8 @@
 
 GoldenStarOS is a 32-bit hobbyist general operating system designed to be minimal and easily understood. It’s written from scratch in C and Assembly, targeting the x86 architecture.
 
+At this stage, GoldenStarOS focuses on core kernel development — bootstrapping, memory management, paging, interrupts, and basic hardware interaction.
+
 ---
 
 ## 🎯 Purpose
@@ -47,6 +49,8 @@ GoldenStarOS exists to:
 - [ ] 💾 Filesystem (FAT32 or custom)
 - [ ] 🧠 Process scheduler
 - [ ] ⌨️ Command-line shell
+
+Once the basics are in place, I’ll decide on a unique direction to set GoldenStarOS apart — whether it’s experimentation with novel ideas, a specific use case, or just elegant simplicity.
 
 ---
 
