@@ -68,4 +68,7 @@ Once the basics are in place, I’ll decide on a unique direction to set GoldenS
 
 ```bash
 ./clean.sh; ./build.sh; ./qemu.sh
+```
+![20250629_19h05m48s_grim](https://github.com/user-attachments/assets/10c3c379-893a-4155-a202-90652678f554)
+
 
